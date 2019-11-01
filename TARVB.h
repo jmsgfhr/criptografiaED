@@ -4,7 +4,8 @@
 const int t = 2;
 
 typedef struct ArvB{
-  int nchaves, folha, *chave;
+  int nchaves, folha;
+  char *chave;
   struct ArvB **filho;
 }TAB;
 
@@ -18,6 +19,6 @@ TAB *libera(TAB *a);
 //Busca nó que contém/deveria conter a chave X
 TAB *busca(TAB* x, int ch);
 //Insere chave k na arvore de ordem t
-TAB *insere(TAB *T, int k, int t);
+TAB *insere(TAB *a, char k, int t);
 TAB* remover(TAB* arv, int ch, int t);
 TAB* retira(TAB* arv, int k, int t);

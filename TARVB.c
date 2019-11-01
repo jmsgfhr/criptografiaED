@@ -7,7 +7,7 @@ TAB *inicializa(){
 TAB *cria(int t){
   TAB* novo = (TAB*)malloc(sizeof(TAB));
   novo->nchaves = 0;
-  novo->chave =(int*)malloc(sizeof(int*)*((t*2)-1));
+  novo->chave =(char*)malloc(sizeof(char*)*((t*2)-1));
   novo->folha=1;
   novo->filho = (TAB**)malloc(sizeof(TAB*)*t*2);
   int i;
@@ -34,7 +34,7 @@ void imprime(TAB *a, int andar){
     for(i=0; i<=a->nchaves-1; i++){
       imprime(a->filho[i],andar+1);
       for(j=0; j<=andar; j++) printf("   ");
-      printf("%d\n", a->chave[i]);
+      printf("%c\n", a->chave[i]);
     }
     imprime(a->filho[i],andar+1);
   }
@@ -51,7 +51,7 @@ TAB *busca(TAB* x, int ch){
 }
 
 TAB *divisao(TAB *x, int i, TAB* y, int t){
-  TAB *z=Cria(t);
+  TAB *z=cria(t);
   z->nchaves= t - 1;
   z->folha = y->folha;
   int j;
@@ -71,10 +71,10 @@ TAB *divisao(TAB *x, int i, TAB* y, int t){
   return x;
 }
 
-TAB *insere_Nao_Completo(TAB *x, int k, int t){
+TAB *insere_Nao_Completo(TAB *x, char k, int t){
   int i = x->nchaves-1;
   if(x->folha){
-    while((i>=0) && (k<x->chave[i])){
+    while((i>=0) && (k < x->chave[i])){
       x->chave[i+1] = x->chave[i];
       i--;
     }
@@ -82,36 +82,36 @@ TAB *insere_Nao_Completo(TAB *x, int k, int t){
     x->nchaves++;
     return x;
   }
-  while((i>=0) && (k<x->chave[i])) i--;
+  while((i>=0) && (k < x->chave[i])) i--;
   i++;
   if(x->filho[i]->nchaves == ((2*t)-1)){
     x = divisao(x, (i+1), x->filho[i], t);
-    if(k>x->chave[i]) i++;
+    if(k > x->chave[i]) i++;
   }
   x->filho[i] = insere_Nao_Completo(x->filho[i], k, t);
   return x;
 }
 
 
-TAB *insere(TAB *T, int k, int t){
-  if(busca(T,k)) return T;
-  if(!T){
-    T=cria(t);
-    T->chave[0] = k;
-    T->nchaves=1;
-    return T;
+TAB *insere(TAB *a, char k, int t){
+  if(busca(a,k)) return a;
+  if(!a){
+    a=cria(t);
+    a->chave[0] = k;
+    a->nchaves=1;
+    return a;
   }
-  if(T->nchaves == (2*t)-1){
+  if(a->nchaves == (2*t)-1){
     TAB *S = cria(t);
     S->nchaves=0;
     S->folha = 0;
-    S->filho[0] = T;
-    S = divisao(S,1,T,t);
+    S->filho[0] = a;
+    S = divisao(S,1,a,t);
     S = insere_Nao_Completo(S,k,t);
     return S;
   }
-  T = insere_Nao_Completo(T,k,t);
-  return T;
+  a = insere_Nao_Completo(a,k,t);
+  return a;
 }
 
 
@@ -264,27 +264,33 @@ TAB* retira(TAB* arv, int k, int t){
 }
 
 int main(int argc, char *argv[]){
-  TAB * arvore = Inicializa();
-  int num = 0, from, to;
-  while(num != -1){
-    printf("Digite um numero para adicionar. 0 para imprimir. -9 para remover e -1 para sair\n");
-    scanf("%i", &num);
-    if(num == -9){
-      scanf("%d", &from);
+  TAB * arvore = inicializa();
+  char letra;
+  char from;
+  while(letra != '#'){
+    printf("Digite uma letra. * para imprimir. - para remover e # para sair\n");
+    scanf(" %c", &letra);
+    //retira
+    if(letra == '-'){
+      printf("Informe a letra que deseja remover");
+      scanf(" %c", &from);
       arvore = retira(arvore, from, t);
-      Imprime(arvore,0);
+      imprime(arvore,0);
     }
-    else if(num == -1){
+    //Sai do programa
+    else if(letra == '#'){
       printf("\n");
-      Imprime(arvore,0);
-      Libera(arvore);
+      imprime(arvore,0);
+      libera(arvore);
       return 0;
     }
-    else if(!num){
+    //imprime
+    else if(letra == '*'){
       printf("\n");
-      Imprime(arvore,0);
+      imprime(arvore,0);
     }
-    else arvore = Insere(arvore, num, t);
+    //insere
+    else arvore = insere(arvore, letra, t);
     printf("\n\n");
   }
 }
