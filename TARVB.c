@@ -71,6 +71,18 @@ TAB *divisao(TAB *x, int i, TAB* y, int t){
   return x;
 }
 
+int vogal(char k) {
+  char vogais[] = {'a', 'e', 'i', 'o', 'u'};
+  for (int j = 0; j < 5; j++) if (k == vogais[j]) return 1;
+  return 0;
+}
+
+int maiuscula(char k) {
+    if ((k >= 65) && (k <= 90)) return 1;
+    return 0;
+}
+
+
 TAB *insere_Nao_Completo(TAB *x, char k, int t){
   int i = x->nchaves-1;
   if(x->folha){
@@ -80,6 +92,8 @@ TAB *insere_Nao_Completo(TAB *x, char k, int t){
     }
     x->chave[i+1] = k;
     x->nchaves++;
+    x->vogal = vogal(k);
+    x->maiuscula = maiuscula(k);
     return x;
   }
   while((i>=0) && (k < x->chave[i])) i--;
@@ -92,12 +106,13 @@ TAB *insere_Nao_Completo(TAB *x, char k, int t){
   return x;
 }
 
-
 TAB *insere(TAB *a, char k, int t){
   if(busca(a,k)) return a;
   if(!a){
     a=cria(t);
     a->chave[0] = k;
+    a->vogal = vogal(k);
+    a->maiuscula = maiuscula(k);
     a->nchaves=1;
     return a;
   }
@@ -115,21 +130,21 @@ TAB *insere(TAB *a, char k, int t){
 }
 
 
-TAB* remover(TAB* arv, int ch, int t){
+TAB* remover(TAB* arv, char ch, int t){
   if(!arv) return arv;
   int i;
-  printf("Removendo %d...\n", ch);
-  for(i = 0; i<arv->nchaves && arv->chave[i] < ch; i++);
+  printf("Removendo %c...\n", ch);
+  for(i = 0; i < arv->nchaves && arv->chave[i] < ch; i++);
   if(i < arv->nchaves && ch == arv->chave[i]){ //CASOS 1, 2A, 2B e 2C
     if(arv->folha){ //CASO 1
-      printf("\nCASO 1\n");
+      printf("CASO 1\n");
       int j;
-      for(j=i; j<arv->nchaves-1;j++) arv->chave[j] = arv->chave[j+1];
+      for(j = i; j < arv->nchaves-1; j++) arv->chave[j] = arv->chave[j+1];
       arv->nchaves--;
       return arv;      
     }
     if(!arv->folha && arv->filho[i]->nchaves >= t){ //CASO 2A
-      printf("\nCASO 2A\n");
+      printf("CASO 2A\n");
       TAB *y = arv->filho[i];  //Encontrar o predecessor k' de k na árvore com raiz em y
       while(!y->folha) y = y->filho[y->nchaves];
       int temp = y->chave[y->nchaves-1];
@@ -261,36 +276,4 @@ TAB* remover(TAB* arv, int ch, int t){
 TAB* retira(TAB* arv, int k, int t){
   if(!arv || !busca(arv, k)) return arv;
   return remover(arv, k, t);
-}
-
-int main(int argc, char *argv[]){
-  TAB * arvore = inicializa();
-  char letra;
-  char from;
-  while(letra != '#'){
-    printf("Digite uma letra. * para imprimir. - para remover e # para sair\n");
-    scanf(" %c", &letra);
-    //retira
-    if(letra == '-'){
-      printf("Informe a letra que deseja remover");
-      scanf(" %c", &from);
-      arvore = retira(arvore, from, t);
-      imprime(arvore,0);
-    }
-    //Sai do programa
-    else if(letra == '#'){
-      printf("\n");
-      imprime(arvore,0);
-      libera(arvore);
-      return 0;
-    }
-    //imprime
-    else if(letra == '*'){
-      printf("\n");
-      imprime(arvore,0);
-    }
-    //insere
-    else arvore = insere(arvore, letra, t);
-    printf("\n\n");
-  }
 }
