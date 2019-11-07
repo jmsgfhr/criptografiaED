@@ -1,4 +1,5 @@
 #include "TARVB.h"
+#include "stdio.h"
 
 TAB *inicializa(){
   return NULL;
@@ -276,4 +277,26 @@ TAB* remover(TAB* arv, char ch, int t){
 TAB* retira(TAB* arv, int k, int t){
   if(!arv || !busca(arv, k)) return arv;
   return remover(arv, k, t);
+}
+
+TAB* criaAlfabeto(char *nome_arquivo, int t) {
+  FILE* alfabeto;
+  TAB *arvore = inicializa();
+
+  alfabeto = fopen(nome_arquivo, "rt");
+
+  if (!alfabeto) {
+    printf("Erro na abertura do arquivo");
+    return NULL;
+  }
+
+  char c;
+
+  do {
+    c = getc(alfabeto);
+    arvore = insere(arvore, c, t);
+    
+  }while (c != EOF);
+
+  return arvore;
 }

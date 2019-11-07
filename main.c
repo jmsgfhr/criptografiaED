@@ -1,22 +1,9 @@
 #include "TARVB.c"
-
-int contadorDeNivelAux (TAB *a, char ch, int cont){
-    int i = 0;
-    while(i < a->nchaves && ch > a->chave[i]) i++; //verifica em qual ponteiro vai 'descer' a busca
-    if(i < a->nchaves && ch == a->chave[i]) return cont; //se achou a letra, retorna o contador atual
-    if(a->folha) return cont; //se já é folha, nao tem um proximo nivel
-    return contadorDeNivelAux(a->filho[i], ch, cont + 1); //vai para o filho e conta o nível
-}
-
-int contadorDeNivel(TAB *a, char ch){
-    if (!a) return 0;
-
-    int contaNivel = 0;
-    return contadorDeNivelAux(a, ch, contaNivel);
-}
+#include "contaNivel.c"
 
 int main(int argc, char *argv[]){
-  TAB * arvore = inicializa();
+  TAB * a = inicializa();
+  
   char letra;
   char from;
   int t;
@@ -29,11 +16,12 @@ int main(int argc, char *argv[]){
     scanf("%d", &t);
   }
 
+  a = criaAlfabeto("alfabetoCompleto.txt", t);
+
   printf("\n");
 
   while(letra != '#'){
     printf("------MENU------\n");
-    printf("Digite uma letra para inserir na árvore\n");
     printf("Digite * para imprimir\n");
     printf("Digite - para remover\n");
     printf("Digite # para sair\n");
@@ -50,31 +38,29 @@ int main(int argc, char *argv[]){
     if(letra == '-'){
       printf("Informe a letra que deseja remover: ");
       scanf(" %c", &from);
-      arvore = retira(arvore, from, t);
-      imprime(arvore, 0);
+      a = retira(a, from, t);
+      imprime(a, 0);
     }
 
     //Sai do programa
     else if(letra == '#'){
       printf("\n");
-      imprime(arvore, 0);
-      libera(arvore);
+      imprime(a, 0);
+      libera(a);
       return 0;
     }
 
     //imprime
     else if(letra == '*'){
       printf("\n");
-      imprime(arvore, 0);
+      imprime(a, 0);
     }
 
     else if (letra == '$') {
-      int j = contadorDeNivel(arvore, 'e');
+      int j = contadorDeNivel(a, 'e');
       printf("Nível de E na arvore: %d", j);
     }
     
-    //insere
-    else arvore = insere(arvore, letra, t);
     printf("\n");
   }
 }

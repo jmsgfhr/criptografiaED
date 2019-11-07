@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#ifndef TARV_H  //Header Guard: evita que o compilador interprete 2 importações de Tarv.h como cópias. 
+#define TARV_H
+
 typedef struct ArvB{
   int nchaves, folha;
   int vogal, maiuscula;
@@ -15,4 +18,7 @@ TAB *libera(TAB *a);
 TAB *busca(TAB* x, int ch);
 TAB *insere(TAB *a, char k, int t);
 TAB* remover(TAB* arv, char ch, int t);
-TAB* retira(TAB* arv, int k, int t);
+TAB* insereAlfabeto(TAB* a, int t);
+TAB* criaAlfabeto(char *nome_arquivo, int t);
+
+#endif
