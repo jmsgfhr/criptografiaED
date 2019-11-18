@@ -1,20 +1,76 @@
 #include "TARVB.c"
 #include "contaNivel.c"
 
-typedef struct huffman
-{
+typedef struct huffman{
     /* data */
     char letra;
     float frequencia;
 }Huff;
 
-typedef struct LHuffman
-{
+typedef struct LHuffman{
     Huff letraFreq;
     struct LHuffman *prox;
 }ListHuff;
 
+ListHuff *criaLista(){
+    return ((ListHuff *) malloc(sizeof(ListHuff))); //alocando o no
+}
 
+int insereHuffList(ListHuff *aux, ListHuff *listLetra, ListHuff *ant){
+    if(listLetra == NULL){
+        if(ant == NULL){
+            aux->prox = listLetra;
+            listLetra = aux;
+            return 0;
+        }
+        else{
+            ant->prox = aux;
+            aux->prox = listLetra;
+            listLetra = aux;
+            return 0;
+        }
+    }
+    else    {
+        if (aux->letraFreq.frequencia>listLetra->letraFreq.frequencia){
+            insereHuffList(aux,listLetra->prox,listLetra);
+        }
+        else if (aux->letraFreq.frequencia<listLetra->letraFreq.frequencia){
+            if (listLetra == NULL){
+                ant->prox = aux;
+                listLetra = aux;
+                return 0;
+            }
+            else if(ant == NULL){
+                aux->prox = listLetra;
+                listLetra = aux;
+                return 0;
+            }
+            else{
+                ant->prox = aux;
+                aux->prox = listLetra;
+                listLetra = aux;
+                return 0;
+            }
+            
+        }
+    }
+}
+
+ListHuff *huffmanInit(ListHuff *listLetra){
+    FILE *fp;
+    float freq;
+    char letr;
+    fp=fopen("alfabetoFreq.bin","rb");
+    while (!feof(fp)){ // verifica se chegou ao fim do arquivo
+        Huff x; //estrutura do no
+        fread(&x,sizeof(x),1,fp); //le uma estrutura por vez
+        ListHuff *aux = criaLista();
+        aux->letraFreq = x;
+        insereHuffList(aux,listLetra,NULL);
+    }
+    fclose(fp);
+    return listLetra;
+}
 
 int main(int argc, char *argv[]){
     /*
@@ -52,29 +108,13 @@ int main(int argc, char *argv[]){
 
 
     //------------------ Cria uma lista encadeada (desnecessaria) para ordenar e comprimir a arvore ------------------
-    FILE *fp;
-    float freq;
-    char letr;
-    ListHuff *listLetra = NULL; //variavel inicial da lista
+    ListHuff *listLetra = huffmanInit(listLetra); //variavel inicial da lista
     //------------------ Le do arquivo binario ------------------
-    fp=fopen("alfabetoFreq.bin","rb");
-    while (!feof(fp)) // verifica se chegou ao fim do arquivo 
-    {
-        Huff x; //estrutura do no
-        fread(&x,sizeof(x),1,fp); //le uma estrutura por vez
-        ListHuff *aux = (ListHuff *) malloc(sizeof(ListHuff)); //alocando o no
-        aux->prox = listLetra;
-        aux->letraFreq = x;
-        listLetra = aux;
-    }
-    while (listLetra!=NULL)
-    {
+    
+    while (listLetra!=NULL){
         printf("%c %f\n",listLetra->letraFreq.letra, listLetra->letraFreq.frequencia);
         ListHuff *aux = listLetra;
         listLetra = listLetra->prox;
         free(aux);
     }
-    
-    
-    fclose(fp);
 }
