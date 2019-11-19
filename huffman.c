@@ -9,51 +9,19 @@ typedef struct huffman{
 
 typedef struct LHuffman{
     Huff letraFreq;
-    struct LHuffman *prox;
+    struct LHuffman *prox, *ant;
 }ListHuff;
 
 ListHuff *criaLista(){
     return ((ListHuff *) malloc(sizeof(ListHuff))); //alocando o no
 }
 
-int insereHuffList(ListHuff *aux, ListHuff *listLetra, ListHuff *ant){
-    if(listLetra == NULL){
-        if(ant == NULL){
-            aux->prox = listLetra;
-            listLetra = aux;
-            return 0;
-        }
-        else{
-            ant->prox = aux;
-            aux->prox = listLetra;
-            listLetra = aux;
-            return 0;
-        }
-    }
-    else    {
-        if (aux->letraFreq.frequencia>listLetra->letraFreq.frequencia){
-            insereHuffList(aux,listLetra->prox,listLetra);
-        }
-        else if (aux->letraFreq.frequencia<listLetra->letraFreq.frequencia){
-            if (listLetra == NULL){
-                ant->prox = aux;
-                listLetra = aux;
-                return 0;
-            }
-            else if(ant == NULL){
-                aux->prox = listLetra;
-                listLetra = aux;
-                return 0;
-            }
-            else{
-                ant->prox = aux;
-                aux->prox = listLetra;
-                listLetra = aux;
-                return 0;
-            }
-            
-        }
-    }
+int insereHuffList(ListHuff *aux, ListHuff *listLetra){
+   if(listLetra == NULL){
+	aux->prox = listLetra;
+	aux->ant = listLetra;
+	listLetra = aux;
+   }
 }
 
 ListHuff *huffmanInit(ListHuff *listLetra){
@@ -66,7 +34,7 @@ ListHuff *huffmanInit(ListHuff *listLetra){
         fread(&x,sizeof(x),1,fp); //le uma estrutura por vez
         ListHuff *aux = criaLista();
         aux->letraFreq = x;
-        insereHuffList(aux,listLetra,NULL);
+        insereHuffList(aux,listLetra);
     }
     fclose(fp);
     return listLetra;
