@@ -16,11 +16,48 @@ ListHuff *criaLista(){
     return ((ListHuff *) malloc(sizeof(ListHuff))); //alocando o no
 }
 
-int insereHuffList(ListHuff *aux, ListHuff *listLetra){
+ListHuff *insereHuffList(ListHuff *aux, ListHuff *listLetra){
    if(listLetra == NULL){
-	aux->prox = listLetra;
-	aux->ant = listLetra;
 	listLetra = aux;
+	listLetra->prox = NULL;
+	listLetra->ant = NULL;
+	return listLetra;
+   }
+   else if(listLetra->letraFreq.frequencia < aux->letraFreq.frequencia){
+        if(listLetra->ant  == NULL){
+            aux->prox = listLetra;
+            aux->ant = NULL;
+            listLetra->ant = aux;
+            listLetra = aux;
+            return listLetra;
+        }
+        else{
+            listLetra->ant->prox = aux;
+            aux->ant = listLetra->ant;
+            listLetra->ant = aux;
+            aux->prox = listLetra;
+            listLetra = aux;
+            return listLetra;
+        }
+   }
+   else if(listLetra->letraFreq.frequencia > aux->letraFreq.frequencia){
+       if (listLetra->prox == NULL)
+       {
+           aux->ant = listLetra;
+           aux->prox = NULL;
+           listLetra->prox = aux;
+           listLetra = aux;
+           return listLetra;
+       }
+       else
+       {
+           listLetra->prox->ant = aux;
+           aux->prox = listLetra->prox;
+           aux->ant = listLetra;
+           listLetra->prox = aux;
+           listLetra = aux;
+           return listLetra;
+       }
    }
 }
 
@@ -34,9 +71,15 @@ ListHuff *huffmanInit(ListHuff *listLetra){
         fread(&x,sizeof(x),1,fp); //le uma estrutura por vez
         ListHuff *aux = criaLista();
         aux->letraFreq = x;
-        insereHuffList(aux,listLetra);
+        listLetra = insereHuffList(aux,listLetra);
+        printf("%c\n",listLetra->letraFreq.letra);
     }
     fclose(fp);
+    while (listLetra->ant != NULL)
+    {
+        listLetra = listLetra->ant;
+    }
+    
     return listLetra;
 }
 
