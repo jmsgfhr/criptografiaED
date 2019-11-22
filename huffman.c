@@ -16,49 +16,49 @@ ListHuff *criaLista(){
     return ((ListHuff *) malloc(sizeof(ListHuff))); //alocando o no
 }
 
+ListHuff *rebobina(ListHuff *aux){ // funcao para voltar toda a lista
+    if (aux->ant != NULL)
+    {
+        rebobina(aux->ant);
+    }
+    return aux;
+}
+
 ListHuff *insereHuffList(ListHuff *aux, ListHuff *listLetra){
-   if(listLetra == NULL){
+   if(listLetra == NULL){ // cria primeiro elemento da lista
 	listLetra = aux;
 	listLetra->prox = NULL;
 	listLetra->ant = NULL;
-	return listLetra;
+	return listLetra = rebobina(listLetra); // retorna a lista ja rebobinada
    }
-   else if(listLetra->letraFreq.frequencia < aux->letraFreq.frequencia){
-        if(listLetra->ant  == NULL){
-            aux->prox = listLetra;
-            aux->ant = NULL;
-            listLetra->ant = aux;
-            listLetra = aux;
-            return listLetra;
-        }
-        else{
-            listLetra->ant->prox = aux;
-            aux->ant = listLetra->ant;
-            listLetra->ant = aux;
-            aux->prox = listLetra;
-            listLetra = aux;
-            return listLetra;
-        }
-   }
-   else if(listLetra->letraFreq.frequencia > aux->letraFreq.frequencia){
-       if (listLetra->prox == NULL)
-       {
+   else if (listLetra->letraFreq.frequencia < aux->letraFreq.frequencia){
+       if (listLetra->prox != NULL){
+           insereHuffList(aux, listLetra->prox); // caso o elemento atual da lista seja menor e houver um proximo, a funcao e chamada novamente com um item a frente
+       }
+       else{ // caso menor e nao haja um proximo ele e adicionado
+           listLetra->prox = aux;
            aux->ant = listLetra;
            aux->prox = NULL;
-           listLetra->prox = aux;
            listLetra = aux;
-           return listLetra;
-       }
-       else
-       {
-           listLetra->prox->ant = aux;
-           aux->prox = listLetra->prox;
-           aux->ant = listLetra;
-           listLetra->prox = aux;
-           listLetra = aux;
-           return listLetra;
        }
    }
+   else if (listLetra->letraFreq.frequencia > aux->letraFreq.frequencia){ // insercao caso elemento atual seja maior
+       if (listLetra->ant == NULL) // caso nao tenha um elemento anterior ele e adicionado 
+       {
+           aux->prox = listLetra;
+           aux->ant = NULL;
+           listLetra->ant = aux;
+           listLetra = aux;
+       }
+       else{ // se houver anterior significa que precisa ser adicionado no meio de dois elementos
+           aux->prox = listLetra;
+           aux->ant = listLetra->ant;
+           listLetra->ant->prox = aux;
+           listLetra->ant = aux;
+           listLetra = aux;
+       }
+   }
+   return listLetra = rebobina(listLetra);
 }
 
 ListHuff *huffmanInit(ListHuff *listLetra){
@@ -69,18 +69,13 @@ ListHuff *huffmanInit(ListHuff *listLetra){
     while (!feof(fp)){ // verifica se chegou ao fim do arquivo
         Huff x; //estrutura do no
         fread(&x,sizeof(x),1,fp); //le uma estrutura por vez
-        ListHuff *aux = criaLista();
-        aux->letraFreq = x;
-        listLetra = insereHuffList(aux,listLetra);
-        printf("%c\n",listLetra->letraFreq.letra);
+        ListHuff *aux = criaLista(); // aloca um espaco de memoria para o elemento
+        aux->letraFreq = x; // diz que o elemento alocado tem valor X
+        listLetra = insereHuffList(aux,listLetra); // insercao em ordem crescente
     }
     fclose(fp);
-    while (listLetra->ant != NULL)
-    {
-        listLetra = listLetra->ant;
-    }
     
-    return listLetra;
+    return listLetra = rebobina(listLetra);
 }
 
 int main(int argc, char *argv[]){
