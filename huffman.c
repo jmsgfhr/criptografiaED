@@ -15,7 +15,7 @@ typedef struct noArv{ // estrutura arvore
 }ArvHuff;
 
 typedef struct lHuffman{ // estrutura da fila
-    ArvHuff noArv;
+    ArvHuff *noArvList;
     struct lHuffman *prox, *ant;
 }ListHuff;
 
@@ -25,6 +25,10 @@ typedef struct lHuffman{ // estrutura da fila
 
 ListHuff *criaLista(){
     return ((ListHuff *) malloc(sizeof(ListHuff))); //alocando o no
+}
+
+ArvHuff *criaArvore(){
+    return ((ArvHuff*) malloc(sizeof(ArvHuff)));
 }
 
 ListHuff *rebobina(ListHuff *aux){ // funcao para voltar toda a lista
@@ -42,7 +46,7 @@ ListHuff *insereHuffList(ListHuff *aux, ListHuff *listLetra){
 	listLetra->ant = NULL;
 	return listLetra = rebobina(listLetra); // retorna a lista ja rebobinada
    }
-   else if (listLetra->noArv.conteudoArvore.frequencia < aux->noArv.conteudoArvore.frequencia){
+   else if (listLetra->noArvList->conteudoArvore.frequencia < aux->noArvList->conteudoArvore.frequencia){
        if (listLetra->prox != NULL){
            insereHuffList(aux, listLetra->prox); // caso o elemento atual da lista seja menor e houver um proximo, a funcao e chamada novamente com um item a frente
        }
@@ -53,7 +57,7 @@ ListHuff *insereHuffList(ListHuff *aux, ListHuff *listLetra){
            listLetra = aux;
        }
    }
-   else if (listLetra->noArv.conteudoArvore.frequencia > aux->noArv.conteudoArvore.frequencia){ // insercao caso elemento atual seja maior
+   else if (listLetra->noArvList->conteudoArvore.frequencia > aux->noArvList->conteudoArvore.frequencia){ // insercao caso elemento atual seja maior
        if (listLetra->ant == NULL) // caso nao tenha um elemento anterior ele e adicionado 
        {
            aux->prox = listLetra;
@@ -81,8 +85,10 @@ ListHuff *huffmanInit(ListHuff *listLetra){
         Huff x; //estrutura do no
         fread(&x,sizeof(x),1,fp); //le uma estrutura por vez
         ListHuff *aux = criaLista(); // aloca um espaco de memoria para o elemento
-        aux->noArv.frequenciaArv = x.frequencia; // diz que o elemento alocado tem valor X
-        aux->noArv.conteudoArvore = x;
+        ArvHuff *NoArvList = criaArvore();
+        NoArvList->conteudoArvore = x;
+        aux->noArvList = NoArvList;
+        aux->noArvList->frequenciaArv = x.frequencia; // diz que o elemento alocado tem valor X
         listLetra = insereHuffList(aux,listLetra); // insercao em ordem crescente
     }
     fclose(fp);
@@ -90,8 +96,12 @@ ListHuff *huffmanInit(ListHuff *listLetra){
     return listLetra = rebobina(listLetra);
 }
 
-ArvHuff *criaArvore(){
-    return ((ArvHuff*) malloc(sizeof(ArvHuff)));
+ArvHuff *huffTreeInit(ArvHuff *huffmanTree, ListHuff *listLetra){
+    if (listLetra->prox != NULL)
+    {
+        
+    }
+    
 }
 
 int main(int argc, char *argv[]){
@@ -135,7 +145,7 @@ int main(int argc, char *argv[]){
     //------------------ Le do arquivo binario ------------------
     
     while (listLetra!=NULL){
-        printf("%c %f\n",listLetra->noArv.conteudoArvore.letra, listLetra->noArv.conteudoArvore.frequencia);
+        printf("%c %f\n",listLetra->noArvList->conteudoArvore.letra, listLetra->noArvList->conteudoArvore.frequencia);
         ListHuff *aux = listLetra;
         listLetra = listLetra->prox;
         free(aux);
@@ -143,6 +153,6 @@ int main(int argc, char *argv[]){
 
     //------------------ Criar a arvore comprimida ------------------
 
-    ArvHuff HuffmanTree;
-
+    ArvHuff *huffmanTree = huffTreeInit(huffmanTree, listLetra);
+    
 }
