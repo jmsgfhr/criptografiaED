@@ -28,7 +28,7 @@ ListHuff *criaLista(){
 }
 
 ArvHuff *criaArvore(){
-    return ((ArvHuff*) malloc(sizeof(ArvHuff)));
+    return ((ArvHuff *) malloc(sizeof(ArvHuff)));
 }
 
 ListHuff *rebobina(ListHuff *aux){ // funcao para voltar toda a lista
@@ -76,6 +76,15 @@ ListHuff *insereHuffList(ListHuff *aux, ListHuff *listLetra){
    return listLetra = rebobina(listLetra);
 }
 
+void emOrdem(ArvHuff *pNo) {
+     if(pNo != NULL) {
+         emOrdem(pNo->esquerda);
+         if(pNo->esquerda == NULL && pNo->direita == NULL)
+            printf("%c %f\n",pNo->conteudoArvore.letra, pNo->conteudoArvore.frequencia);
+         emOrdem(pNo->direita);
+     }
+ }
+
 ListHuff *huffmanInit(ListHuff *listLetra){
     FILE *fp;
     float freq;
@@ -96,12 +105,23 @@ ListHuff *huffmanInit(ListHuff *listLetra){
     return listLetra = rebobina(listLetra);
 }
 
-ArvHuff *huffTreeInit(ArvHuff *huffmanTree, ListHuff *listLetra){
+ArvHuff *huffTreeInit(ListHuff *listLetra){ // ainda em desenvolvimento nao tentar entender =)
     if (listLetra->prox != NULL)
     {
+        ArvHuff *pai;
+        ListHuff *aux = criaLista();
+        pai->esquerda = listLetra->noArvList;
+        pai->direita = listLetra->prox->noArvList;
+        pai->frequenciaArv = pai->esquerda->frequenciaArv + pai->direita->frequenciaArv;
+        listLetra = listLetra->prox->prox;
+        free(listLetra->ant->ant);
+        free(listLetra->ant);
+        listLetra->ant = NULL;
+        aux->noArvList = pai;
+        listLetra = insereHuffList(aux,listLetra);
         
+        return pai;
     }
-    
 }
 
 int main(int argc, char *argv[]){
@@ -138,21 +158,15 @@ int main(int argc, char *argv[]){
     fclose(fp);
     */
 
+
     //------------------ Cria uma lista encadeada (desnecessaria) para ordenar e comprimir a arvore ------------------
 
     ListHuff *listLetra = huffmanInit(listLetra); // inicia a lista
 
-    //------------------ Le do arquivo binario ------------------
-    
-    while (listLetra!=NULL){
-        printf("%c %f\n",listLetra->noArvList->conteudoArvore.letra, listLetra->noArvList->conteudoArvore.frequencia);
-        ListHuff *aux = listLetra;
-        listLetra = listLetra->prox;
-        free(aux);
-    }
-
     //------------------ Criar a arvore comprimida ------------------
 
-    ArvHuff *huffmanTree = huffTreeInit(huffmanTree, listLetra);
-    
+    ArvHuff *huffmanTree = huffTreeInit(listLetra);
+
+
+    emOrdem(huffmanTree);
 }
