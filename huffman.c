@@ -46,7 +46,7 @@ ListHuff *insereHuffList(ListHuff *aux, ListHuff *listLetra){
 	listLetra->ant = NULL;
 	return listLetra = rebobina(listLetra); // retorna a lista ja rebobinada
    }
-   else if (listLetra->noArvList->conteudoArvore.frequencia < aux->noArvList->conteudoArvore.frequencia){
+   else if (listLetra->noArvList->frequenciaArv < aux->noArvList->frequenciaArv){
        if (listLetra->prox != NULL){
            insereHuffList(aux, listLetra->prox); // caso o elemento atual da lista seja menor e houver um proximo, a funcao e chamada novamente com um item a frente
        }
@@ -57,7 +57,7 @@ ListHuff *insereHuffList(ListHuff *aux, ListHuff *listLetra){
            listLetra = aux;
        }
    }
-   else if (listLetra->noArvList->conteudoArvore.frequencia > aux->noArvList->conteudoArvore.frequencia){ // insercao caso elemento atual seja maior
+   else if (listLetra->noArvList->frequenciaArv > aux->noArvList->frequenciaArv){ // insercao caso elemento atual seja maior
        if (listLetra->ant == NULL) // caso nao tenha um elemento anterior ele e adicionado 
        {
            aux->prox = listLetra;
@@ -106,20 +106,39 @@ ListHuff *huffmanInit(ListHuff *listLetra){
 }
 
 ArvHuff *huffTreeInit(ListHuff *listLetra){ // ainda em desenvolvimento nao tentar entender =)
-    if (listLetra->prox != NULL)
+    
+    if(listLetra == NULL) // caso nao haja lista nao fazer nada e retornar
+        return NULL;
+    else if (listLetra != NULL && listLetra->prox == NULL) // caso exista apenas um elemento na lista entra nessa funcao
     {
-        ArvHuff *pai;
+        ArvHuff *pai = criaArvore();
         ListHuff *aux = criaLista();
-        pai->esquerda = listLetra->noArvList;
-        pai->direita = listLetra->prox->noArvList;
-        pai->frequenciaArv = pai->esquerda->frequenciaArv + pai->direita->frequenciaArv;
-        listLetra = listLetra->prox->prox;
-        free(listLetra->ant->ant);
-        free(listLetra->ant);
-        listLetra->ant = NULL;
-        aux->noArvList = pai;
-        listLetra = insereHuffList(aux,listLetra);
-        
+        pai->esquerda, pai->direita = NULL; // assume que o lado esquerdo e o lado direito sao nulos
+        pai = listLetra->noArvList; // pai assume valor do elemento  na lista
+        free(listLetra); // libera lista
+        return pai; // retorna
+    }
+    else if (listLetra != NULL && listLetra->prox != NULL) // entra na funcao caso tenha pelo menos 2 elementos na lista
+    {
+        ArvHuff *pai = criaArvore();
+        ListHuff *aux = criaLista();
+        pai->esquerda = listLetra->noArvList; // assume que esquerda e o menor elemento da lista atualmente
+        pai->direita = listLetra->prox->noArvList; // direita seria o segundo menor elemento da lista
+        pai->frequenciaArv = pai->esquerda->frequenciaArv + pai->direita->frequenciaArv; // assume que frequencia do pai e igual a soma das frequencias de seus filhos
+        if (listLetra->prox->prox != NULL) // condicao caso o terceiro elemento da lista nao seja nulo
+        {
+            ListHuff *trash;
+            trash = listLetra;
+            listLetra = listLetra->prox; // lista igual o segundo
+            aux->noArvList = pai;
+            printf("%f",aux->noArvList->frequenciaArv);
+            listLetra = insereHuffList(aux,listLetra);
+        }
+        else
+        {
+            return NULL;
+        }
+        huffTreeInit(listLetra);
         return pai;
     }
 }
@@ -165,8 +184,13 @@ int main(int argc, char *argv[]){
 
     //------------------ Criar a arvore comprimida ------------------
 
+    /*while (listLetra != NULL)
+    {
+        printf("%c\n",listLetra->noArvList->conteudoArvore.letra);
+        listLetra = listLetra->prox;
+    }*/
+    
     ArvHuff *huffmanTree = huffTreeInit(listLetra);
-
 
     emOrdem(huffmanTree);
 }
